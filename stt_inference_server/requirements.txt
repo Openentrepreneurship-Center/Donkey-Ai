@@ -1,0 +1,21 @@
+# AI Inference Server - STT + Diarization
+# Python 3.10+
+
+# Config
+pydantic-settings>=2.0.0
+
+# Web framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+
+# STT - Faster-Whisper
+faster-whisper>=1.0.0
+
+# Diarization (Docker에서는 Dockerfile에서 cu121로 오버라이드)
+pyannote.audio>=3.0.0
+torch>=2.0.0
+torchaudio>=2.0.0
+
+# HuggingFace
+huggingface-hub>=0.20.0
