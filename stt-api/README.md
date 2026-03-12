@@ -39,7 +39,7 @@ uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 python -m app.main
 ```
 
-## Docker 배포 (온프레미스)
+## Docker 배포 (온프레미스 GPU 서버)
 
 서버에서 **git clone → .env 설정 → docker 실행**만 하면 됩니다.
 
@@ -57,7 +57,9 @@ docker compose up -d --build
 ```
 
 - **접속**: `http://localhost:8000`
-- **GPU 사용**: `docker-compose.yml`에서 `deploy.resources` 주석 해제 후 `nvidia-container-toolkit` 설치 필요
+- **GPU**: docker-compose에 GPU 설정 포함. 서버에 `nvidia-container-toolkit` 설치 필요
+  - [NVIDIA 공식 설치 가이드](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html)
+  - 설치 후 `nvidia-smi` 로 GPU 확인, `sudo systemctl restart docker` 실행
 - **재시작**: `docker compose restart`
 
 ## API 엔드포인트
