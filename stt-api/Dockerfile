@@ -1,5 +1,4 @@
 # STT API - Faster-Whisper + pyannote 화자분리
-# syntax=docker/dockerfile:1
 #
 # [빠른 테스트] 1~2분
 #   docker build --target test -t stt-api:test .
@@ -25,8 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
 WORKDIR /app
 COPY pyproject.toml ./
 COPY app/ ./app/
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -e .
+RUN pip install -e .
 
 EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
