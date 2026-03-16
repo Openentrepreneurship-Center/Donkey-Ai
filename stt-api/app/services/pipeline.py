@@ -18,26 +18,38 @@ def _assign_speaker_to_segments(
 ) -> list[dict]:
     """
     전사 세그먼트에 화자 라벨 할당.
-    시간 겹침이 가장 큰 diarization 구간의 speaker를 할당.
+    1) 세그먼트 중점(center)이 속한 diarization 구간의 speaker 사용
+    2) 없으면 시간 겹침(overlap)이 가장 큰 구간 사용
     """
     if not diar_segments:
-        return transcript_segments
+        logger.warning("화자 분리 결과가 비어 있음")
+        return [{**s, "speaker": None} for s in transcript_segments]
 
     result = []
     for seg in transcript_segments:
         s_start, s_end = seg["start"], seg["end"]
-        best_speaker = None
-        best_overlap = 0.0
+        mid = (s_start + s_end) / 2.0
 
+        # 1) 중점이 포함된 diar 구간 찾기
+        speaker = None
         for d in diar_segments:
-            d_start, d_end = d["start"], d["end"]
-            overlap = min(s_end, d_end) - max(s_start, d_start)
-            if overlap > best_overlap:
-                best_overlap = overlap
-                best_speaker = d["speaker"]
+            if d["start"] <= mid <= d["end"]:
+                speaker = d["speaker"]
+                break
 
-        out = {**seg, "speaker": best_speaker}
-        result.append(out)
+        # 2) 없으면 overlap 최대인 구간
+        if speaker is None:
+            best_overlap = 0.0
+            for d in diar_segments:
+                overlap = min(s_end, d["end"]) - max(s_start, d["start"])
+                if overlap > best_overlap:
+                    best_overlap = overlap
+                    speaker = d["speaker"]
+            # 겹침이 너무 작으면 미할당 (노이즈 방지)
+            if best_overlap < 0.05:
+                speaker = None
+
+        result.append({**seg, "speaker": speaker})
     return result
 
 
@@ -87,6 +99,12 @@ async def transcribe_with_diarization(
     )
 
     transcript_segments, diar_segments = await asyncio.gather(trans_task, diar_task)
+
+    logger.info(
+        "전사 %d구간, 화자분리 %d구간 → 매칭",
+        len(transcript_segments),
+        len(diar_segments),
+    )
 
     # 화자 라벨 할당
     return _assign_speaker_to_segments(transcript_segments, diar_segments)

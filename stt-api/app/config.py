@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     # 화자 분리 (pyannote) - HUGGINGFACE_TOKEN 필요 (또는 huggingface-cli login)
     enable_diarization: bool = Field(default=True, validation_alias="ENABLE_DIARIZATION")
     huggingface_token: str = Field(default="", validation_alias="HUGGINGFACE_TOKEN")
-    # 의료 상담(의사-환자) 시 2로 설정하면 화자분리 속도 향상 (비우면 자동 탐지)
+    # 화자 수. None=자동 탐지. 2 등 지정 시 해당 인원으로 고정(의사·환자 등)
     diarization_num_speakers: int | None = Field(default=None, validation_alias="DIARIZATION_NUM_SPEAKERS")
 
     @field_validator("diarization_num_speakers", mode="before")
