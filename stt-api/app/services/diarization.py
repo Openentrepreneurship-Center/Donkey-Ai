@@ -46,6 +46,7 @@ def _get_cached_pipeline():
 def run_diarization(wav_path: str | Path) -> list[dict]:
     """
     화자 분리 실행.
+    설정에서 num_speakers 지정 시 해당 인원 고정, 없으면 min_speakers 이상으로 자동 탐지 (기본 min=1).
     Returns list of {"start": float, "end": float, "speaker": str}.
     """
     from app.config import get_settings
@@ -57,6 +58,10 @@ def run_diarization(wav_path: str | Path) -> list[dict]:
     kwargs = {}
     if settings.diarization_num_speakers is not None:
         kwargs["num_speakers"] = settings.diarization_num_speakers
+    else:
+        kwargs["min_speakers"] = settings.diarization_min_speakers
+        if settings.diarization_max_speakers is not None:
+            kwargs["max_speakers"] = settings.diarization_max_speakers
 
     diarization = pipeline(str(path), **kwargs)
 

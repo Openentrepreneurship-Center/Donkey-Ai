@@ -28,15 +28,25 @@ class Settings(BaseSettings):
     # 화자 분리 (pyannote) - HUGGINGFACE_TOKEN 필요 (또는 huggingface-cli login)
     enable_diarization: bool = Field(default=True, validation_alias="ENABLE_DIARIZATION")
     huggingface_token: str = Field(default="", validation_alias="HUGGINGFACE_TOKEN")
-    # 화자 수. None=자동 탐지. 2 등 지정 시 해당 인원으로 고정(의사·환자 등)
+    # 화자 수. None이면 min/max만 적용(자동). 2 등 지정 시 해당 인원으로 고정
     diarization_num_speakers: int | None = Field(default=None, validation_alias="DIARIZATION_NUM_SPEAKERS")
+    # 자동 탐지 시 최소 화자 수. 1=기본(완전 자동). 2로 두면 2명 대화에서 1명으로 나오는 것 방지
+    diarization_min_speakers: int = Field(default=1, validation_alias="DIARIZATION_MIN_SPEAKERS")
+    diarization_max_speakers: int | None = Field(default=None, validation_alias="DIARIZATION_MAX_SPEAKERS")
 
-    @field_validator("diarization_num_speakers", mode="before")
+    @field_validator("diarization_num_speakers", "diarization_max_speakers", mode="before")
     @classmethod
     def empty_str_to_none(cls, v):
         if v == "" or v is None:
             return None
         return v
+
+    @field_validator("diarization_min_speakers", mode="before")
+    @classmethod
+    def min_speakers_default(cls, v):
+        if v == "" or v is None:
+            return 1
+        return int(v)
 
     model_config = {
         "env_file": Path(__file__).resolve().parent.parent / ".env",
