@@ -21,12 +21,12 @@ def _get_diarization_pipeline():
             "화자 분리 사용 시 HUGGINGFACE_TOKEN이 필요합니다. "
             ".env에 HUGGINGFACE_TOKEN=hf_xxx 를 추가하세요. "
             "토큰: https://huggingface.co/settings/tokens, "
-            "pyannote 약관 동의: https://huggingface.co/pyannote/speaker-diarization-3.1. "
+            "pyannote 약관 동의: https://huggingface.co/pyannote/speaker-diarization-community-1. "
             "화자 분리 없이 전사만 하려면 ENABLE_DIARIZATION=false 로 설정하세요."
         )
 
     pipeline = Pipeline.from_pretrained(
-        "pyannote/speaker-diarization-3.1",
+        "pyannote/speaker-diarization-community-1",
         token=token,
     )
     try:
